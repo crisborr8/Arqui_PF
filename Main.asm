@@ -8,10 +8,10 @@ section .data
 	igs db 'ES IGUAL', 10, 13, '$'
 	ign db 'NO ES IGUAL', 10, 13, '$'
 	
-	len db 10
-	act db 0
+	len db 10	;LONGITUD
+	act	db 0	;SE GUARDARA LA CANTIDAD DE CARACTERES INGRESADOS
 	bf db 10 dup 0
-								
+	
 org 100h							
 section .text 		
 global _start		
@@ -33,41 +33,41 @@ global _start
 %endmacro	
 
 %macro getDato 0
-	mov ah, 0ah				;FUNCION DE LECTURA
-	mov dx, len				;TAMAÑO DEL BUFFER
+	mov ah, 0ah	;LECTURA DEL BUFFER
+	mov dx, len	;VA PRIMERO LA LONGITUD DEL STRING
+	int 21h		;DEVUELVE EN DX LA CADENA INGRESADA
+	
+	mov ah, 02h ;SALIDA DE CARACTER EN ASCCI
+	mov dl, 10 	;CARACTER EN ASCII SALTO DE LINEA
+	int 21h
+	mov dl, 13	;RETORNO DE CARRO
 	int 21h
 	
-	mov ah,02h				;SALIDA DE CARACTER
-	mov dl,10				;SALTO DE LINEA ASCII
-	int 21h
-	mov dl,13				;RETORNO DE CARRO
-	int 21h
-	
-	mov bx, act    			;PUNTERO DEL TAMAÑO DEL TEXTO
-	mov dx, bf 				;PUNTERO DEL INICIO DEL CARACTER EN DX
-	add dl, byte[bx]     	;AGREGAR LA LONGITUD DEL PUNTERO DE CARACTER
-							; we need ^ the "byte" otherwise we will be adding the full 16bit number at that location.
-	mov bx,dx            	;MUEVE EL PUNTERO DX A BC
-	mov byte[bx],'$'    	;AGREGAMOS EL FINAL DE LINEA $.
+	mov bx, act	;SE GUARDA LA CANTIDAD DE CARACTERES INGRESADOS
+	mov dx, bf	;APUNTA AL INICIO DE BF
+	add dl, byte[bx]	;AÑADE LA LONGITUD A BX (ACT), EN BYTE O SE AGREGARA EL NUMERO EN 16BITS
+	mov bx,dx 			;MUEVE EL PUNTERO A BX
+	mov byte[bx], '$'	;FINAL DE LA CADENA
 %endmacro
 
 _start:				
 	mostrarMenu
 	getDato
+	
 	mov ah, 09h
 	mov dx, bf
-	cmp dx, '1'
-	jne noUno
-	mov dx, igs
-	jmp sig
+	int 21h
 	
-	noUno:
-		mov dx, ign
+	cmp dx, '1$'
+	jne sig
+		mov dx, igs
+		jmp fin
 	sig:
-	int 21h
-	mov dx, bf
+		mov dx, ign
+		
 	int 21h
 	
+	fin:
 	mov ah, 4ch
 	int 21h
 end	
