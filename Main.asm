@@ -5,6 +5,7 @@ section .data
 	m4 db '   2 - Registrar', 10, 13, '$'
 	m5 db '   3 - Salir', 10, 13, '$'
 	
+	uno db 'uno', 0
 	igs db 'ES IGUAL', 10, 13, '$'
 	ign db 'NO ES IGUAL', 10, 13, '$'
 	
@@ -33,41 +34,44 @@ global _start
 %endmacro	
 
 %macro getDato 0
-	mov ah, 0ah	;LECTURA DEL BUFFER
-	mov dx, len	;VA PRIMERO LA LONGITUD DEL STRING
-	int 21h		;DEVUELVE EN DX LA CADENA INGRESADA
-	
-	mov ah, 02h ;SALIDA DE CARACTER EN ASCCI
-	mov dl, 10 	;CARACTER EN ASCII SALTO DE LINEA
-	int 21h
-	mov dl, 13	;RETORNO DE CARRO
+	mov ah, 0ah
+	mov dx, len
 	int 21h
 	
-	mov bx, act	;SE GUARDA LA CANTIDAD DE CARACTERES INGRESADOS
-	mov dx, bf	;APUNTA AL INICIO DE BF
-	add dl, byte[bx]	;AÑADE LA LONGITUD A BX (ACT), EN BYTE O SE AGREGARA EL NUMERO EN 16BITS
-	mov bx,dx 			;MUEVE EL PUNTERO A BX
-	mov byte[bx], '$'	;FINAL DE LA CADENA
+	mov ah, 02h
+	mov dl, 10
+	int 21h
+	
+	mov dl, 13
+	int 21h
+	
+	mov bx, act
+	mov dx, bf
+	add dl, byte[bx]
+	mov bx, dx
+	mov byte[bx], 0
 %endmacro
 
 _start:				
 	mostrarMenu
 	getDato
 	
+	mov ax, uno  ; compare input with msg variable
+	mov si,ax          ; SI is the first string
+	mov ax,bf 
+	mov di,ax          ; DI is the second string, it shouldn't matter what order.
+	mov ax,121Eh    ; function number
+	int 2Fh
 	mov ah, 09h
-	mov dx, bf
-	int 21h
-	
-	cmp dx, '1$'
-	jne sig
-		mov dx, igs
+	jnz sig
+	mov dx, igs
 		jmp fin
 	sig:
 		mov dx, ign
 		
-	int 21h
 	
 	fin:
+	int 21h
 	mov ah, 4ch
 	int 21h
 end	
