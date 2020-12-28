@@ -1,5 +1,6 @@
 org 100h	
-%include "texts.asm"
+%include "data.asm"
+%include "bss.asm"
 %include "login.asm"	
 %include "getData.asm"	
 %include "errors.asm"	
