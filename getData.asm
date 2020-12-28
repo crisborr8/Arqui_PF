@@ -5,15 +5,23 @@
 
 %macro getDatoUsr 0
 	xor si, si
+	mov dl, ' '
 	%%ciclo:
 		getChar
 		cmp si, 7
 			jae %%fin_ciclo
 		cmp al, 0dh
-			je %%fin_ciclo
+			je %%fin_cicloEnter
 		mov usr[si], al
 		inc si
-		call %%ciclo
+		jmp %%ciclo
+		
+	%%fin_cicloEnter:
+		cmp si, 7
+		jae %%fin_ciclo
+		mov usr[si], dl
+		inc si
+		jmp %%fin_cicloEnter
 		
 	%%fin_ciclo:
 		salto
@@ -27,7 +35,7 @@
 		cmp si, 4
 			jae %%fin_ciclo
 		cmp al, 0dh
-			je %%fin_ciclo
+			je %%fin_cicloEnter
 		cmp al, 48
 			jb %%noNum
 		cmp al, 57
@@ -39,6 +47,13 @@
 		mov psw[si], al
 		inc si
 		call %%ciclo
+		
+	%%fin_cicloEnter:
+		cmp si, 7
+		jae %%fin_ciclo
+		mov usr[si], dl
+		inc si
+		jmp %%fin_cicloEnter
 		
 	%%fin_ciclo:
 		salto

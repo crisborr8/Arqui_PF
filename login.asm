@@ -46,26 +46,49 @@
 	jz %%fin	
 		
 	compararUsr
-	
+	mov ah, 09h
+	cmp cl, 0
+	je %%noigual
+	mov dx, p1
+	jmp %%fin
+	%%noigual:
+	mov dx, p2
 	%%fin:
+	int 21h
 	salto
 %endmacro
 
 %macro compararUsr 0
+	;------------------COMPARAR USUARIO
 	mov si, 0
-	mov bl, '$'
-	
 	%%ciclo:
-	mov cl, 0
-	cmp texto[si], bl
-	je %%fin
-	mov ah, 02h
-	mov dl, texto[si]
-	int 21h
-	
-	inc si
-	jmp %%ciclo
-	
+		mov cl, 0
+		mov bl, '$'
+		cmp texto[si], bl
+		je %%fin
+		mov bl, ' '
+		mov di, 0
+			%%ciclo_2:
+				cmp di, 7
+				je %%fin_ciclo2
+				mov bh, usr[di]
+				cmp texto[si], bh
+				je %%contiunar
+			%%noigual:
+				mov cl, 0
+				sub si, di
+				add si, 9
+				jmp %%fin_ciclo2
+			%%contiunar:
+				inc di
+				inc si
+				mov cl, 1
+				jmp %%ciclo_2
+			%%fin_ciclo2:
+		cmp cl, 1
+		je %%fin
+		add si, 6
+		jmp %%ciclo
 	%%fin:
 %endmacro
 
