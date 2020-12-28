@@ -29,66 +29,44 @@
 
 %macro leerUsers 0
 	salto
-	
-	mov cl, 0
-	
-	mov ah, 3dh				;FUNCION PARA ABRIR UN ARCHIVO CON 21h
-	mov al, 0				;MODO 0 LECTURA, 1 ESCRITURA, 2 AMBOS
-	mov dx, f_user			;NOMBRE DEL ARCHIVO A LEER
+		
+	mov ah,3dh			; abriendo un archivo
+	mov al,0			; indicando que lo estoy abriendo en modo lectura
+	mov dx,f_user		;especifico la ruta del archivo
 	int 21h
-	mov [filehndl], ax		;handler
-	
-	mov ah, 3fh				;READ-FROM-A-FILE
-	mov bx, [filehndl]		
-	mov cx, 0ffh			;BYTES MAXIMOS A LEER
-	mov dx, iobuf			;DIRECCION DEL BUFFER
+	jc %%fin
+	mov bx,ax			; handle del archivo lo copio a bx
+
+	mov ah,3fh			;funcion para leer archivo
+	mov dx,texto		; indico la variable en donde guardare lo leido
+	mov cx,0ffh			; numero de bytes a leer
 	int 21h
-	mov [read_len], ax		;GUARDAR EL NUMERO DE BYTES A LEER
-	
-	mov ah, 3eh				;CERRAR ARCHIVO
-	mov bx, [filehndl]		
-	int 21h
-	
-	
-	
-	;mov ah,040h        ; write-to-a-file
-    ;mov bx,1           ; file handle for standard output
-    ;mov cx,4  ; bytes to write - same number we read :)
-    ;mov dx,iobuf + 9       ; buffer to write from
-    ;int 021h           ; call on Good Old Dos
-	
-	;mov al, 0  		    ;7 para usuario, 14 para usuario y contraseña 16 para primer caracter de siguiente usuario
-							;0 para usuario, 9 para contraseña
-	
-	mov si,iobuf
-	mov di, 0
-	%%ciclo:
-	cmp di,[read_len]
-	ja %%fin
-	
-	add di, 8
-	mov ah,040h        		;write-to-a-file	
-    mov bx,1           		;file handle for standard output
-    mov cx,7  				;7 para usuario
-    mov dx,si		;buffer to write from
-    int 21h           		;call on Good Old Dos
-	
-	add di, 5
-	add si, 9
-	mov ah,040h        		;write-to-a-file	
-    mov bx,1           		;file handle for standard output	
-    mov cx,4  				;7 para usuario
-    mov dx,si		;buffer to write from
-    int 21h           		;call on Good Old Dos	
-	add si, 6
-	salto
-	jmp %%ciclo
-	
-	;add al, 9
-	salto
+	jc %%fin
+	cmp ax,0			; si ax = 0 significa que EOF
+	jz %%fin	
+		
+	compararUsr
 	
 	%%fin:
 	salto
+%endmacro
+
+%macro compararUsr 0
+	mov si, 0
+	mov bl, '$'
+	
+	%%ciclo:
+	mov cl, 0
+	cmp texto[si], bl
+	je %%fin
+	mov ah, 02h
+	mov dl, texto[si]
+	int 21h
+	
+	inc si
+	jmp %%ciclo
+	
+	%%fin:
 %endmacro
 
 %macro registrar 0
