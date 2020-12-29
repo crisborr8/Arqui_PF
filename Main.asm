@@ -2,29 +2,14 @@ org 100h
 %include "data.asm"
 %include "bss.asm"
 %include "login.asm"	
+%include "user.asm"
+%include "admin.asm"
 %include "getData.asm"	
 %include "errors.asm"	
 %include "extra.asm"		
 				
 section .text 		
 global _start		
-
-%macro mostrarMenu_Principal 0
-	mov ah, 09h
-	mov dx, pts
-	int 21h
-	mov dx, m_1
-	int 21h
-	mov dx, m_2
-	int 21h
-	mov dx, m_3
-	int 21h
-	mov dx, m_4
-	int 21h
-	mov dx, pts
-	int 21h
-%endmacro	
-
 
 _start:				
 	mostrarMenu_Principal

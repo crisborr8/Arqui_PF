@@ -84,3 +84,15 @@
 		call %%ciclo
 	%%fin_ciclo:
 %endmacro
+
+%macro resetTexto 0
+	xor si, si
+	mov al, '$'
+	%%ciclo:
+		cmp si, 255
+			jae %%fin_ciclo
+		mov texto[si], al
+		inc si
+		call %%ciclo
+	%%fin_ciclo:
+%endmacro
