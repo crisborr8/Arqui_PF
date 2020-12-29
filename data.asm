@@ -21,15 +21,20 @@ section .data
 	l_2 db '-------- REGISTRO --------', 10, 13, '$'
 	l_3 db 'Nombre de usuario:', 10, 13, '$'
 	l_4 db 'Contrasenha:', 10, 13, '$'
-	p1 db 'IGUALESSS:', 10, 13, '$'
-	p2 db 'NO IGUALES:', 10, 13, '$'
+	
+;---------------------------------------------------------------
+;------------------------ADMIN------------------------
+;---------------------------------------------------------------
+	a_1 db '-------- ADMIN --------', 10, 13, '$'
+	a_2 db '-------- USUARIO --------', 10, 13, '$'
 	
 ;---------------------------------------------------------------
 ;----------------------------Errores----------------------------
 ;---------------------------------------------------------------
 	er_Main db 'ERROR, seleccione un dato del 1 al 3', 10, 13, '$'
-	er_Ingr db 'ERROR, usuario o contrasenha incorrecta', 10, 13, '$'
-	er_IngrPsw db 'ERROR, contrasenha solo debe de ser numerica', 10, 13, '$'
+	er_Psw db 'ERROR, contrasenha solo debe de ser numerica', 10, 13, '$'
+	er_IngU db 'ERROR, usuario incorrecto', 10, 13, '$'
+	er_IngP db 'ERROR, contrasenha incorrecto', 10, 13, '$'
 	
 ;---------------------------------------------------------------
 ;-----------------------------DATAS-----------------------------

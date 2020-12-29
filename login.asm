@@ -21,7 +21,7 @@
 	%%errorPsw:
 		salto
 		mov ah, 09h
-		mov dx, er_IngrPsw
+		mov dx, er_Psw
 		int 21h
 		salto
 	%%fin:
@@ -46,19 +46,32 @@
 	jz %%fin	
 		
 	compararUsr
-	mov ah, 09h
-	cmp cl, 0
-	je %%noigual
-	mov dx, p1
-	int 21h
-	cmp cl, 2
-	jne %%noigual
-	mov dx, p1
-	jmp %%fin
-	%%noigual:
-	mov dx, p2
+	cmp cl, 0			;USUARIO INCORRECTO
+	je %%usr_inc
+	cmp cl, 1			;CONTRASEÑA INCORRECTA
+	je %%psw_inc
+	cmp cl, 2			;2 USUARIO, 3 ADMIN
+	je %%us_user
+	%%us_admin:
+		mov ah, 09h
+		mov dx, a_1
+		int 21h
+		jmp %%fin
+	%%us_user:
+		mov ah, 09h
+		mov dx, a_2
+		int 21h
+		jmp %%fin
+	%%psw_inc:
+		mov ah, 09h
+		mov dx, er_IngP
+		int 21h
+		jmp %%fin
+	%%usr_inc:
+		mov ah, 09h
+		mov dx, er_IngU
+		int 21h
 	%%fin:
-	int 21h
 	salto
 %endmacro
 
@@ -69,7 +82,7 @@
 	%%ciclo:
 		mov cl, 0
 		cmp texto[si], bl
-		je %%fin
+		je %%fin2
 		mov di, 0
 			%%ciclo_2:
 				cmp di, 7
@@ -92,7 +105,7 @@
 		je %%verificarPsw
 		add si, 6
 		jmp %%ciclo
-	jmp %%fin
+	jmp %%fin2
 	
 	%%verificarPsw:
 		add si, 2
@@ -112,6 +125,10 @@
 				mov cl, 2
 				jmp %%ciclo_p
 	%%fin:
+		cmp si, 16
+		ja %%fin2
+		mov cl, 3
+	%%fin2:
 %endmacro
 
 %macro registrar 0
