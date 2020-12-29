@@ -50,6 +50,10 @@
 	cmp cl, 0
 	je %%noigual
 	mov dx, p1
+	int 21h
+	cmp cl, 2
+	jne %%noigual
+	mov dx, p1
 	jmp %%fin
 	%%noigual:
 	mov dx, p2
@@ -61,12 +65,11 @@
 %macro compararUsr 0
 	;------------------COMPARAR USUARIO
 	mov si, 0
+	mov bl, '$'
 	%%ciclo:
 		mov cl, 0
-		mov bl, '$'
 		cmp texto[si], bl
 		je %%fin
-		mov bl, ' '
 		mov di, 0
 			%%ciclo_2:
 				cmp di, 7
@@ -86,9 +89,28 @@
 				jmp %%ciclo_2
 			%%fin_ciclo2:
 		cmp cl, 1
-		je %%fin
+		je %%verificarPsw
 		add si, 6
 		jmp %%ciclo
+	jmp %%fin
+	
+	%%verificarPsw:
+		add si, 2
+		mov di, 0
+		%%ciclo_p:
+			cmp di, 4
+			je %%fin
+			mov bh, psw[di]
+			cmp texto[si], bh
+			je %%contiunar_p
+			%%noigual_p:
+				mov cl, 1
+				jmp %%fin
+			%%contiunar_p:
+				inc di
+				inc si
+				mov cl, 2
+				jmp %%ciclo_p
 	%%fin:
 %endmacro
 

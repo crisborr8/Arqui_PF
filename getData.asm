@@ -30,6 +30,7 @@
 %macro getDatoPsw 0
 	xor si, si
 	mov cl, 0
+	mov dl, ' '
 	%%ciclo:
 		getChar
 		cmp si, 4
@@ -46,12 +47,12 @@
 		%%continua:
 		mov psw[si], al
 		inc si
-		call %%ciclo
+		jmp %%ciclo
 		
 	%%fin_cicloEnter:
-		cmp si, 7
+		cmp si, 4
 		jae %%fin_ciclo
-		mov usr[si], dl
+		mov psw[si], dl
 		inc si
 		jmp %%fin_cicloEnter
 		
