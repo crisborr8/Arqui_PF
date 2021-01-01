@@ -115,7 +115,7 @@
 			je %%contiunar_p
 			%%noigual_p:
 				mov cl, 1
-				jmp %%fin
+				jmp %%fin2
 			%%contiunar_p:
 				inc di
 				inc si
@@ -145,6 +145,7 @@
 	je %%errorUsr
 	mov cl, 0
 	
+	%%ingresoPsw:
 	mov ah, 09h
 	mov dx, l_4
 	int 21h
@@ -161,7 +162,7 @@
 		mov dx, er_Psw
 		int 21h
 		salto
-		jmp %%fin
+		jmp %%ingresoPsw
 	%%errorUsr:
 		salto
 		mov ah, 09h

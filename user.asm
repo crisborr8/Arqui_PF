@@ -13,7 +13,7 @@
 		errorMain
 		jmp %%ciclo
 	%%uno:
-		user_Jugar
+		load_Juego
 		jmp %%ciclo
 	%%dos:
 		user_Cargar
@@ -21,12 +21,7 @@
 	%%fin:
  %endmacro
  
- %macro user_Jugar 0
-	mov ah, 09h
-	mov dx, p_1
-	int 21h
- %endmacro
- 
+ ;CARGA DE ARCHIVO
  %macro user_Cargar 0
 	mov ah, 09h
 	mov dx, p_2

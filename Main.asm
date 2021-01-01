@@ -3,6 +3,7 @@ org 100h
 %include "bss.asm"
 %include "login.asm"	
 %include "user.asm"
+%include "Juego.asm"
 %include "admin.asm"
 %include "getData.asm"	
 %include "errors.asm"	
