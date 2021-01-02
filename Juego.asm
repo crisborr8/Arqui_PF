@@ -15,6 +15,10 @@
 	%%mainLoop:
 		setHeader
 		set_Items
+		
+		mov ax, [perdido]
+		cmp ax, 0
+		je %%finProg
 		;===================delay==========================
 		
 		Delay	
@@ -79,6 +83,7 @@
 	mov [t_m], ax				;MINUTOS A 0
 	mov [obs_tmpAnt], ax		;TIEMPO ANTERIOR DE OBSTACULOS A 0
 	mov [pre_tmpAnt], ax		;TIEMPO ANTERIOR DE PREMIOS A 0
+	mov [ptn], ax				;PUNTAJE A 0
 	
 								;TODOS LOS PREMIOS EMPEZARAN EN LA PARTE DE ARRIBA
 	mov [pre_CoordY1], ax
@@ -106,6 +111,9 @@
 	mov ax, 1
 	mov [obs_tmp], ax
 	mov [pre_tmp], ax
+	mov ax, 15
+	mov [pre_pts], ax			;PUNTAJE DE PREMIOS
+	mov [obs_pts], ax			;PUNTAJE DE OBSTACULOS
  %endmacro
  ;---------------------------------------------------------------------
  %macro Delay 0
@@ -125,6 +133,7 @@
 	int 16h
  %endmacro
  ;---------------------------------------------------------------------
+ 
  %macro imprimirNumeros 2 
 	mov al,[%1]	; numero al registro al
 	AAM			; divide los numeros en digitos
@@ -141,6 +150,25 @@
 	imprimir dece, %2+01h
 	imprimir uni, %2 +02h
  %endmacro
+ %macro ImprimirPuntaje 2			; 1er = la cantidad que lleva el cronometro ; 2do = posicion donde quiero imprimirlo
+	mov bx, [%1]
+	push bx
+	cmp bx, 100
+	jb %%dosDigitos
+		mov ax, bx
+		mov bx, 100
+		mov dx, 0 
+		div bx
+		mov [%1], ax
+		push dx
+		imprimirNumeros %1, %2
+		pop dx
+		mov [%1], dx
+	%%dosDigitos:
+		imprimirNumeros %1, %2 + 02h
+	pop bx
+	mov [%1], bx
+%endmacro
  %macro imprimir 2		; 1ro = lo que imprimo ; 2do = currimiento del cursor
   ;funcion 02h, interrupción 10h 
   ;Correr el cursor N cantidad de veces
@@ -194,7 +222,7 @@
 	imprimir usr, 01H	;NOMBRE USUARIO
 	imprimir nv_, 0BH	;Nivel
 	imprimir nv0, 0FH	;Nivel
-	imprimir ptn, 16H	;Numero nivel
+	ImprimirPuntaje ptn, 16H	;Numero nivel
 	
 	setTiempo
 %endmacro
@@ -310,6 +338,36 @@
 	pop ax
 %endmacro
  ;---------------------------------------------------------------------
+%macro verCosilion 2	;1-X  2-Y
+	mov cl, 0			;CONDICION INCIIAL, SI ES 0 NO HAY, 1 SI HAY COLISICION
+	
+	mov bx, [%2]		;OBTENEMOS Y SUPERIOR DE LA ESTRELLA
+	add bx, 9			;OBTENEMOS Y INFERIOR DE LA ESTRELLA
+	mov dx, [CoordY_car]	;OBTENEMOS Y DEL CARRO
+	cmp bx, dx			
+	jb %%fin			;SI NO HA LLEGADO A Y DEL CARRO TERMINA
+	
+	mov bx, [%1]		;OBTENEMOS X DERECHA DE LA ESTRELLA
+	mov dx, [CoordX_car]	;OBTENEMOS X DERECHA DEL CARRO
+						
+						;PRIMERO VERIFICAMOS SI LA ESQUINA DERECHA DE LA ESTRELLA
+						;TOCA CON LA ESQUINA IZUIQERDA DEL CARRO
+	add bx, 9
+	cmp bx, dx
+	jb %%fin
+						;AHORA COMPARAMOS LA ESQUINA IZQUIERDA DE LA ESTRELLA
+						;CON LA ESQUINA DERECHA DEL CARRO
+	sub bx, 9
+	add dx, 9
+	cmp bx, dx
+	ja %%fin
+	
+	mov cl, 1			;HAY COLISION
+	mov ax, 185			;PARA ELIMINAR LA ESTRELLA DEL FONDO
+	
+	%%fin:
+%endmacro
+ ;---------------------------------------------------------------------
 %macro pre_Mover 2		;1-X  2-Y
 	mov ax, [%2]
 	cmp ax, 0
@@ -317,6 +375,9 @@
 	%%mover:
 		add ax, 10
 		mov [%2],ax
+		
+		verCosilion %1, %2
+		
 		cmp ax, 185
 		jb %%dibujar
 		mov ax, 0
@@ -331,6 +392,15 @@
 		add ax, 15
 		%%asignar:
 		mov [%1], ax
+		
+		cmp cl, 1		;colision verdadera
+		je %%colision
+		
+		jmp %%fin
+	%%colision:			;SUMA
+		mov ax, [ptn]
+		add ax, [pre_pts]
+		mov [ptn], ax
 		jmp %%fin
 	%%dibujar:
 		mov ax, [%1]	;X
@@ -400,6 +470,9 @@
 	%%mover:
 		add ax, 10
 		mov [%2],ax
+		
+		verCosilion %1, %2
+		
 		cmp ax, 185
 		jb %%dibujar
 		mov ax, 0
@@ -414,7 +487,25 @@
 		add ax, 15
 		%%asignar:
 		mov [%1], ax
+		
+		cmp cl, 1		;colision verdadera
+		je %%colision
+		
 		jmp %%fin
+	%%colision:			;RESTA
+		mov ax, [ptn]
+		mov bx, [obs_pts]
+		cmp ax, bx
+		jb %%perdida
+		sub ax, bx
+		cmp ax, 0
+		jae %%resta
+		%%perdida:
+		mov ax, 0
+		mov [perdido], ax
+		%%resta:
+		mov [ptn], ax
+		jmp %%fin	
 	%%dibujar:
 		mov ax, [%1]	;X
 		mov bx, [%2]	;Y

@@ -77,7 +77,7 @@ section .data
 	crg db 255 dup('$'), '$'	;RUTA CARGA JUEGO
 	nv_ db 'Nv:', '$'			;PALABRA NV:
 	nv0 db '00', '$'			;NUMERO DE NIVEL
-	ptn db '000', '$'			;PUNTOS
+	ptn db 0, '$'			;PUNTOS
 	t_mi db 2 dup ('$'), '$'	;TIEMPO MICROSEGUNDOS 0 - 9
 	t_s db 2 dup ('$'), '$'		;TIEMPO SEGUNDOS
 	t_m db 2 dup ('$'), '$'		;TIEMPO MINUTOS
@@ -87,6 +87,7 @@ section .data
 	dosP 			db 0,"$"	;DOS PUNTOS
 	
 	vel dw 30					;VELOCIDAD DE LAS ESTRELLAS
+	perdido db 1				;VARIABLE QUE INDICA QUE NO HAS PERDIDO
 	
 ;---------------------------------------------------------------
 ;----------------------------SPRITES----------------------------
