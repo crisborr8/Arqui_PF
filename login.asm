@@ -57,6 +57,9 @@
 		admin_Main
 		jmp %%fin
 	%%us_user:
+		mov ax, 0
+		mov [nvM], ax				;NIVEL MAXIMO A 0
+		resetPth
 		user_Main
 		jmp %%fin
 	%%psw_inc:

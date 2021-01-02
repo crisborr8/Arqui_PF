@@ -49,10 +49,15 @@ section .data
 	u_3 db '   3 - Salir', 10, 13, '$'
 	
 ;---------------------------------------------------------------
+;-----------------------------JUEGO-----------------------------
+;---------------------------------------------------------------
+	j_1 db 'INGRESE EL NOMBRE DEL ARCHIVO.play', 10, 13, '$'
+	
+;---------------------------------------------------------------
 ;-----------------------------pruebas-----------------------------
 ;---------------------------------------------------------------
-	p_1 db '   JUGANDO EL JUEGO', 10, 13, '$'
-	p_2 db '  CARGANDO EL JUEGO', 10, 13, '$'
+	p_1 db ' LEYENDO .PLAY', 10, 13, '$'
+	p_2 db '  NOMBRE:', 10, 13, '$'
 	p_3 db '  SE REGISTRE UN USUARIO', 10, 13, '$'
 	
 ;---------------------------------------------------------------
@@ -63,6 +68,7 @@ section .data
 	er_Usr db 'ERROR, usuario ya existe', 10, 13, '$'
 	er_IngU db 'ERROR, usuario incorrecto', 10, 13, '$'
 	er_IngP db 'ERROR, contrasenha incorrecto', 10, 13, '$'
+	er_Jue db 'ERROR, debe cargar un juego .play', 10, 13, '$'
 	
 ;---------------------------------------------------------------
 ;-----------------------------DATAS-----------------------------
@@ -74,19 +80,26 @@ section .data
 ;---------------------------------------------------------------
 ;-----------------------------JUEGO-----------------------------
 ;---------------------------------------------------------------
-	crg db 255 dup('$'), '$'	;RUTA CARGA JUEGO
+	pth db 255 dup(0), '$'	;RUTA CARGA JUEGO
+	
 	nv_ db 'Nv:', '$'			;PALABRA NV:
-	nv0 db '00', '$'			;NUMERO DE NIVEL
-	ptn db 0, '$'			;PUNTOS
+	nv0 db 0, '$'				;NUMERO DE NIVEL ACTUAL
+	nvM db 0,"$"				;NIVEL MAXIMO
+	
+	ptn db 0, '$'				;PUNTOS
+	
 	t_mi db 2 dup ('$'), '$'	;TIEMPO MICROSEGUNDOS 0 - 9
 	t_s db 2 dup ('$'), '$'		;TIEMPO SEGUNDOS
 	t_m db 2 dup ('$'), '$'		;TIEMPO MINUTOS
+	
+	segAct db 0, '$'		;TIEMPO SEGUNDOS ACTUALES
+	segMax db 0, '$'		;TIEMPO SEGUNDOS MAXIMOS
 
 	uni 			db 0,"$"	;UNIDAD
 	dece 			db 0,"$"	;DECENA
 	dosP 			db 0,"$"	;DOS PUNTOS
 	
-	vel dw 30					;VELOCIDAD DE LAS ESTRELLAS
+	vel dw 20					;VELOCIDAD DE LAS ESTRELLAS
 	perdido db 1				;VARIABLE QUE INDICA QUE NO HAS PERDIDO
 	
 ;---------------------------------------------------------------
@@ -111,9 +124,9 @@ section .data
 	car_f14 DB  27, 4,14,12,12,12,14, 4,27 
 
 ;------------------------ESTRELLA BUENA-------------------------
-	pre_pts  	db 2 dup ('$'), '$'		;PUNTOS QUE DA
-	pre_tmp  	db 2 dup ('$'), '$'		;TIEMPO PARA QUE APAREZCA 
-	pre_tmpAnt  db 2 dup ('$'), '$'		;TIEMPO QUE HA PASADO
+	pre_pts  	dw 0					;PUNTOS QUE DA
+	pre_tmp  	dw 0					;TIEMPO PARA QUE APAREZCA 
+	pre_tmpAnt  dw 0					;TIEMPO QUE HA PASADO
 	
 	pre_CoordY1	dw 0
 	pre_CoordY2	dw 0
@@ -137,9 +150,9 @@ section .data
 	stb_8  DB  27,14,27,27,42,27,27,14,27
 	stb_9  DB  44,27,27,27,43,27,27,27,44
 ;------------------------ESTRELLA  MALA-------------------------
-	obs_pts  	db 2 dup ('$'), '$'		;PUNTOS QUE DA
-	obs_tmp  	db 2 dup ('$'), '$'		;TIEMPO PARA QUE APAREZCA 
-	obs_tmpAnt  db 2 dup ('$'), '$'		;TIEMPO QUE HA PASADO
+	obs_pts  	dw 0					;PUNTOS QUE DA
+	obs_tmp  	dw 0					;TIEMPO PARA QUE APAREZCA 
+	obs_tmpAnt  dw 0					;TIEMPO QUE HA PASADO
 	
 	obs_CoordY1	dw 0
 	obs_CoordY2	dw 0

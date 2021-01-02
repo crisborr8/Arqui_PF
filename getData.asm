@@ -60,6 +60,19 @@
 		salto
 %endmacro
 
+%macro getDatoPth 0
+	xor si, si
+	%%ciclo:
+		getChar
+		cmp al, 0dh
+			je %%fin_ciclo
+		mov pth[si], al
+		inc si
+		jmp %%ciclo
+		
+	%%fin_ciclo:
+		salto
+%endmacro
 
 %macro resetUsr 0
 	xor si, si
@@ -92,6 +105,18 @@
 		cmp si, 255
 			jae %%fin_ciclo
 		mov texto[si], al
+		inc si
+		call %%ciclo
+	%%fin_ciclo:
+%endmacro
+
+%macro resetPth 0
+	xor si, si
+	mov al, 0
+	%%ciclo:
+		cmp si, 255
+			jae %%fin_ciclo
+		mov pth[si], al
 		inc si
 		call %%ciclo
 	%%fin_ciclo:

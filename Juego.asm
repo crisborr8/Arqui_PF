@@ -1,3 +1,9 @@
+ %macro load_JuegoData 0
+	mov ax, 0
+	mov [nv0], ax				;NIVEL INICIAL A 0
+	mov [ptn], ax				;PUNTAJE A 0
+ %endmacro
+ 
  %macro load_Juego 0
 	setData
 	;iniciar el modo video., 13h
@@ -19,6 +25,11 @@
 		mov ax, [perdido]
 		cmp ax, 0
 		je %%finProg
+		
+		mov ax, [segAct]
+		mov bx, [segMax]
+		cmp ax, bx
+		jae %%siguienteNivel
 		;===================delay==========================
 		
 		Delay	
@@ -74,6 +85,17 @@
 	%%finProg:
 		mov ax,3h		; funcion para el modo texto	
 		int 10h
+		jmp %%fin
+		
+	%%siguienteNivel:
+		mov ax, [nv0]
+		cmp ax, 3
+		jae %%finProg
+		setData
+		dibujarTodo
+		jmp %%mainLoop
+		
+	%%fin:
  %endmacro
  ;**************************FUNCIONAMIENTO DEL CARRO
  %macro setData 0
@@ -83,7 +105,9 @@
 	mov [t_m], ax				;MINUTOS A 0
 	mov [obs_tmpAnt], ax		;TIEMPO ANTERIOR DE OBSTACULOS A 0
 	mov [pre_tmpAnt], ax		;TIEMPO ANTERIOR DE PREMIOS A 0
-	mov [ptn], ax				;PUNTAJE A 0
+	
+	mov [segAct], ax			;TIEMPO ACTUAL A 0
+	mov [segMax], ax			;TIEMPO ACTUAL A 0
 	
 								;TODOS LOS PREMIOS EMPEZARAN EN LA PARTE DE ARRIBA
 	mov [pre_CoordY1], ax
@@ -106,14 +130,12 @@
 	mov ah, 165
 	mov [CoordY_car], ah		;CENTRAR EL CARRO EN Y	
 	
+	mov ax, [nv0]				;INCREMENTAR NIVEL POR 1
+	inc ax
+	mov [nv0], ax
+
 	
-	;ESTO SE BORRARA SOLO PARA PRUEBAS
-	mov ax, 1
-	mov [obs_tmp], ax
-	mov [pre_tmp], ax
-	mov ax, 15
-	mov [pre_pts], ax			;PUNTAJE DE PREMIOS
-	mov [obs_pts], ax			;PUNTAJE DE OBSTACULOS
+	setDatosNivel
  %endmacro
  ;---------------------------------------------------------------------
  %macro Delay 0
@@ -197,6 +219,10 @@
 	%%mas_seg:
 		mov ax, 0
 		mov [t_mi], ax
+		
+		mov ax, [segAct]
+		inc ax
+		mov [segAct], ax
 	
 		mov ax, [t_s]
 		inc ax
@@ -221,7 +247,7 @@
 %macro setHeader 0
 	imprimir usr, 01H	;NOMBRE USUARIO
 	imprimir nv_, 0BH	;Nivel
-	imprimir nv0, 0FH	;Nivel
+	imprimirNumeros nv0, 0DH	;Nivel
 	ImprimirPuntaje ptn, 16H	;Numero nivel
 	
 	setTiempo
@@ -444,7 +470,7 @@
 	%%fin:
 %endmacro
 %macro setPremios 0
-	mov ax, [t_s]
+	mov ax, [segAct]
 	mov bx, [pre_tmpAnt]
 	sub ax, bx
 	cmp ax, [pre_tmp]
@@ -456,7 +482,7 @@
 		pre_Nuevo pre_CoordY3
 		pre_Nuevo pre_CoordY4
 		pre_Nuevo pre_CoordY5
-		mov ax, [t_s]
+		mov ax, [segAct]
 		mov [pre_tmpAnt], ax
 	%%movimiento:
 		dibujarTodo
@@ -548,7 +574,7 @@
 	%%fin:
 %endmacro
 %macro setObstaculos 0
-	mov ax, [t_s]
+	mov ax, [segAct]
 	mov bx, [obs_tmpAnt]
 	sub ax, bx
 	cmp ax, [obs_tmp]
@@ -560,7 +586,7 @@
 		obs_Nuevo obs_CoordY3
 		obs_Nuevo obs_CoordY4
 		obs_Nuevo obs_CoordY5
-		mov ax, [t_s]
+		mov ax, [segAct]
 		mov [obs_tmpAnt], ax
 	%%movimiento:
 		dibujarTodo
