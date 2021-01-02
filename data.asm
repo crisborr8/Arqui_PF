@@ -86,9 +86,12 @@ section .data
 	dece 			db 0,"$"	;DECENA
 	dosP 			db 0,"$"	;DOS PUNTOS
 	
+	vel dw 30					;VELOCIDAD DE LAS ESTRELLAS
+	
 ;---------------------------------------------------------------
 ;----------------------------SPRITES----------------------------
 ;---------------------------------------------------------------
+;----------------------------CARROS-----------------------------
 	CoordX_car 			dw 155
 	CoordY_car 			dw 165
 	car_f1  DB  27,27,27,12,12,12,27,27,27
@@ -106,6 +109,58 @@ section .data
 	car_f13 DB  17,12,31,30,30,30,30,12,17 
 	car_f14 DB  27, 4,14,12,12,12,14, 4,27 
 
+;------------------------ESTRELLA BUENA-------------------------
+	pre_pts  	db 2 dup ('$'), '$'		;PUNTOS QUE DA
+	pre_tmp  	db 2 dup ('$'), '$'		;TIEMPO PARA QUE APAREZCA 
+	pre_tmpAnt  db 2 dup ('$'), '$'		;TIEMPO QUE HA PASADO
+	
+	pre_CoordY1	dw 0
+	pre_CoordY2	dw 0
+	pre_CoordY3	dw 0
+	pre_CoordY4	dw 0
+	pre_CoordY5	dw 0
+	
+	pre_CoordX1	dw 50
+	pre_CoordX2	dw 250
+	pre_CoordX3	dw 100
+	pre_CoordX4	dw 200
+	pre_CoordX5	dw 150
+	
+	stb_1  DB  44,27,27,27,43,27,27,27,44
+	stb_2  DB  27,14,27,27,42,27,27,14,27
+	stb_3  DB  27,27,14,27,27,27,14,27,27
+	stb_4  DB  27,27,27,27,44,27,27,27,27
+	stb_5  DB  43,42,27,44,27,44,27,42,43
+	stb_6  DB  27,27,27,27,44,27,27,27,27
+	stb_7  DB  27,27,14,27,27,27,14,27,27
+	stb_8  DB  27,14,27,27,42,27,27,14,27
+	stb_9  DB  44,27,27,27,43,27,27,27,44
+;------------------------ESTRELLA  MALA-------------------------
+	obs_pts  	db 2 dup ('$'), '$'		;PUNTOS QUE DA
+	obs_tmp  	db 2 dup ('$'), '$'		;TIEMPO PARA QUE APAREZCA 
+	obs_tmpAnt  db 2 dup ('$'), '$'		;TIEMPO QUE HA PASADO
+	
+	obs_CoordY1	dw 0
+	obs_CoordY2	dw 0
+	obs_CoordY3	dw 0
+	obs_CoordY4	dw 0
+	obs_CoordY5	dw 0
+	
+	obs_CoordX1	dw 150
+	obs_CoordX2	dw 200
+	obs_CoordX3	dw 50
+	obs_CoordX4	dw 250
+	obs_CoordX5	dw 100
+	
+	stm_1  DB  47,27,27,27,45,27,27,27,47
+	stm_2  DB  27,02,27,27,46,27,27,02,27
+	stm_3  DB  27,27,02,27,27,27,02,27,27
+	stm_4  DB  27,27,27,27,47,27,27,27,27
+	stm_5  DB  45,46,27,47,27,47,27,46,45
+	stm_6  DB  27,27,27,27,47,27,27,27,27
+	stm_7  DB  27,27,02,27,27,27,02,27,27
+	stm_8  DB  27,02,27,27,46,27,27,02,27
+	stm_9  DB  47,27,27,27,45,27,27,27,47
 
 ;---------------------------------------------------------------
 ;----------------------------ARCHIVO----------------------------

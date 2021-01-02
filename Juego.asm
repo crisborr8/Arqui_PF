@@ -10,10 +10,11 @@
 	mov es,ax
 	xor di,di
 	
-	DibujarCarro
+	dibujarTodo
 	
 	%%mainLoop:
 		setHeader
+		set_Items
 		;===================delay==========================
 		
 		Delay	
@@ -41,40 +42,18 @@
 		jae %%mainLoop
 		add ax, 10
 		mov [CoordX_car],ax
-		DibujarCarro
+		dibujarTodo
 		jmp %%mainLoop
 		
 	%%Mov2:
 		cmp al,'a'
-		jne %%Mov3
+		jne %%mainLoop
 		mov ax,[CoordX_car]
 		cmp ax, 15
 		jbe %%mainLoop
 		sub ax, 10
 		mov [CoordX_car],ax
-		DibujarCarro
-		jmp %%mainLoop
-	
-	%%Mov3:
-		cmp al,'w'
-		jne %%Mov4	
-		mov ax,[CoordY_car]
-		cmp ax, 25
-		jbe %%mainLoop
-		sub ax, 10
-		mov [CoordY_car],ax
-		DibujarCarro
-		jmp %%mainLoop
-		
-	%%Mov4:
-		cmp al,'s'
-		jne %%mainLoop
-		mov ax,[CoordY_car]
-		cmp ax, 175
-		jae %%mainLoop
-		add ax, 10
-		mov [CoordY_car],ax
-		DibujarCarro
+		dibujarTodo
 		jmp %%mainLoop
 		
 	%%Pausa:
@@ -95,16 +74,40 @@
  ;**************************FUNCIONAMIENTO DEL CARRO
  %macro setData 0
 	mov ax, 0
-	mov [t_mi], ax
-	mov [t_s], ax
-	mov [t_m], ax
+	mov [t_mi], ax				;MICROSEGUNDOS A 0
+	mov [t_s], ax				;SEGUNDOS A 0
+	mov [t_m], ax				;MINUTOS A 0
+	mov [obs_tmpAnt], ax		;TIEMPO ANTERIOR DE OBSTACULOS A 0
+	mov [pre_tmpAnt], ax		;TIEMPO ANTERIOR DE PREMIOS A 0
+	
+								;TODOS LOS PREMIOS EMPEZARAN EN LA PARTE DE ARRIBA
+	mov [pre_CoordY1], ax
+	mov [pre_CoordY2], ax
+	mov [pre_CoordY3], ax
+	mov [pre_CoordY4], ax
+	mov [pre_CoordY5], ax
+								;TODOS LOS OBSTACULOS EMPEZARAN EN LA PARTE DE ARRIBA
+	mov [obs_CoordY1], ax
+	mov [obs_CoordY2], ax
+	mov [obs_CoordY3], ax
+	mov [obs_CoordY4], ax
+	mov [obs_CoordY5], ax
+	
 	mov ah, 3ah
-	mov [dosP], ah
+	mov [dosP], ah				;DOS PUNTOS A ':'
+	
 	mov ah, 155
-	mov [CoordX_car], ah
+	mov [CoordX_car], ah		;CENTRAR EL CARRO EN X
 	mov ah, 165
-	mov [CoordY_car], ah
+	mov [CoordY_car], ah		;CENTRAR EL CARRO EN Y	
+	
+	
+	;ESTO SE BORRARA SOLO PARA PRUEBAS
+	mov ax, 1
+	mov [obs_tmp], ax
+	mov [pre_tmp], ax
  %endmacro
+ ;---------------------------------------------------------------------
  %macro Delay 0
 	mov ah,86h
 	mov cx,0			; tiempo del delay
@@ -121,6 +124,7 @@
 	xor ah,ah
 	int 16h
  %endmacro
+ ;---------------------------------------------------------------------
  %macro imprimirNumeros 2 
 	mov al,[%1]	; numero al registro al
 	AAM			; divide los numeros en digitos
@@ -194,6 +198,13 @@
 	
 	setTiempo
 %endmacro
+ ;---------------------------------------------------------------------
+%macro dibujarTodo 0
+	setFondo
+	DibujarCarro
+	DibujarEstrellas
+%endmacro
+ ;---------------------------------------------------------------------
 %macro setFondo 0
 	mov ax, 15
 	mov bx, 25
@@ -219,6 +230,7 @@
 		dec bx
 		jnz %%loopRow
 %endmacro
+ ;---------------------------------------------------------------------
 %macro setCarro 1
 	push ax
 	mov di, ax
@@ -233,8 +245,6 @@
 	pop ax
 %endmacro
 %macro DibujarCarro 0
-	setFondo
-	
 	mov ax, [CoordX_car]
 	mov bx, [CoordY_car]
 	mov cx,bx	;coord x
@@ -272,5 +282,214 @@
 	add ax, 320
 	setCarro car_f14
 %endmacro
- 
- 
+ ;---------------------------------------------------------------------
+%macro DibujarEstrellas 0
+	pre_Mover pre_CoordX1, pre_CoordY1
+	pre_Mover pre_CoordX2, pre_CoordY2
+	pre_Mover pre_CoordX3, pre_CoordY3
+	pre_Mover pre_CoordX4, pre_CoordY4
+	pre_Mover pre_CoordX5, pre_CoordY5
+	
+	obs_Mover obs_CoordX1, obs_CoordY1
+	obs_Mover obs_CoordX2, obs_CoordY2
+	obs_Mover obs_CoordX3, obs_CoordY3
+	obs_Mover obs_CoordX4, obs_CoordY4
+	obs_Mover obs_CoordX5, obs_CoordY5
+%endmacro
+%macro setEstrella 1
+	push ax
+	mov di, ax
+	mov si, 0
+	%%loop:
+		mov ax, %1[si]
+		mov [es:di], ax		;PINTAR EN ES+DI CON COLOR AX
+		inc di
+		inc si
+		cmp si, 8
+		jb %%loop
+	pop ax
+%endmacro
+ ;---------------------------------------------------------------------
+%macro pre_Mover 2		;1-X  2-Y
+	mov ax, [%2]
+	cmp ax, 0
+	je %%fin
+	%%mover:
+		add ax, 10
+		mov [%2],ax
+		cmp ax, 185
+		jb %%dibujar
+		mov ax, 0
+		mov [%2], ax
+		mov ax,[%1]
+		add ax, 60
+		cmp ax, 270
+		jbe %%asignar
+		sub ax, 270
+		cmp ax, 15
+		jae %%asignar
+		add ax, 15
+		%%asignar:
+		mov [%1], ax
+		jmp %%fin
+	%%dibujar:
+		mov ax, [%1]	;X
+		mov bx, [%2]	;Y
+		mov cx,bx	;coord x
+		shl cx,8	
+		shl bx,6
+		add bx,cx	; bx = 320
+		add ax,bx	; sumar x a y
+		mov di, ax
+		
+		setEstrella stb_1
+		add ax,320
+		setEstrella stb_2
+		add ax,320
+		setEstrella stb_3
+		add ax,320
+		setEstrella stb_4
+		add ax,320
+		setEstrella stb_5
+		add ax,320
+		setEstrella stb_6
+		add ax,320
+		setEstrella stb_7
+		add ax,320
+		setEstrella stb_8
+		add ax,320
+		setEstrella stb_9
+	%%fin:
+%endmacro	
+%macro pre_Nuevo 1		;Y
+	cmp cl, 0
+	jne %%fin
+	mov ax, [%1]
+	cmp ax, 0
+	jne %%fin
+	%%nuevo:
+		mov ax, 25
+		mov [%1], ax
+		mov cl, 1
+	%%fin:
+%endmacro
+%macro setPremios 0
+	mov ax, [t_s]
+	mov bx, [pre_tmpAnt]
+	sub ax, bx
+	cmp ax, [pre_tmp]
+	jb %%movimiento
+	%%dibujar:
+		mov cl, 0 		;0 no ingresado
+		pre_Nuevo pre_CoordY1
+		pre_Nuevo pre_CoordY2
+		pre_Nuevo pre_CoordY3
+		pre_Nuevo pre_CoordY4
+		pre_Nuevo pre_CoordY5
+		mov ax, [t_s]
+		mov [pre_tmpAnt], ax
+	%%movimiento:
+		dibujarTodo
+	%%fin:
+%endmacro
+ ;---------------------------------------------------------------------
+%macro obs_Mover 2		;1-X  2-Y
+	mov ax, [%2]
+	cmp ax, 0
+	je %%fin
+	%%mover:
+		add ax, 10
+		mov [%2],ax
+		cmp ax, 185
+		jb %%dibujar
+		mov ax, 0
+		mov [%2], ax
+		mov ax,[%1]
+		add ax, 60
+		cmp ax, 270
+		jbe %%asignar
+		sub ax, 270
+		cmp ax, 15
+		jae %%asignar
+		add ax, 15
+		%%asignar:
+		mov [%1], ax
+		jmp %%fin
+	%%dibujar:
+		mov ax, [%1]	;X
+		mov bx, [%2]	;Y
+		mov cx,bx	;coord x
+		shl cx,8	
+		shl bx,6
+		add bx,cx	; bx = 320
+		add ax,bx	; sumar x a y
+		mov di, ax
+		
+		setEstrella stm_1
+		add ax,320
+		setEstrella stm_2
+		add ax,320
+		setEstrella stm_3
+		add ax,320
+		setEstrella stm_4
+		add ax,320
+		setEstrella stm_5
+		add ax,320
+		setEstrella stm_6
+		add ax,320
+		setEstrella stm_7
+		add ax,320
+		setEstrella stm_8
+		add ax,320
+		setEstrella stm_9
+	%%fin:
+%endmacro	
+%macro obs_Nuevo 1		;Y
+	cmp cl, 0
+	jne %%fin
+	mov ax, [%1]
+	cmp ax, 0
+	jne %%fin
+	%%nuevo:
+		mov ax, 25
+		mov [%1], ax
+		mov cl, 1
+	%%fin:
+%endmacro
+%macro setObstaculos 0
+	mov ax, [t_s]
+	mov bx, [obs_tmpAnt]
+	sub ax, bx
+	cmp ax, [obs_tmp]
+	jb %%movimiento
+	%%dibujar:
+		mov cl, 0 		;0 no ingresado
+		obs_Nuevo obs_CoordY1
+		obs_Nuevo obs_CoordY2
+		obs_Nuevo obs_CoordY3
+		obs_Nuevo obs_CoordY4
+		obs_Nuevo obs_CoordY5
+		mov ax, [t_s]
+		mov [obs_tmpAnt], ax
+	%%movimiento:
+		dibujarTodo
+	%%fin:
+%endmacro
+ ;---------------------------------------------------------------------
+%macro set_Items 0
+	mov ax, [t_mi]
+	mov si, [vel]
+	mov cx, 0
+	%%ciclo:
+	cmp cx, 100
+	jae %%fin
+	cmp ax, cx
+	jne %%aumento
+		setPremios
+		setObstaculos
+		jmp %%fin
+	%%aumento:
+		add cx, si
+		jmp %%ciclo
+	%%fin:
+%endmacro
