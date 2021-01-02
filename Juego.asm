@@ -125,10 +125,10 @@
 	mov ah, 3ah
 	mov [dosP], ah				;DOS PUNTOS A ':'
 	
-	mov ah, 155
-	mov [CoordX_car], ah		;CENTRAR EL CARRO EN X
-	mov ah, 165
-	mov [CoordY_car], ah		;CENTRAR EL CARRO EN Y	
+	mov ax, 155
+	mov [CoordX_car], ax		;CENTRAR EL CARRO EN X
+	mov ax, 165
+	mov [CoordY_car], ax		;CENTRAR EL CARRO EN Y	
 	
 	mov ax, [nv0]				;INCREMENTAR NIVEL POR 1
 	inc ax

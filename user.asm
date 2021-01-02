@@ -21,11 +21,6 @@
 		%%siguiente:
 			load_JuegoData
 			load_Juego
-			mov ah, 09h
-			mov dx, segAct
-			int 21h
-			mov dx, segMax
-			int 21h
 			jmp %%ciclo
 	%%dos:
 		user_Cargar
