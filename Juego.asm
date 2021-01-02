@@ -1,7 +1,8 @@
  %macro load_JuegoData 0
 	mov ax, 0
 	mov [nv0], ax				;NIVEL INICIAL A 0
-	mov [ptn], ax				;PUNTAJE A 0
+	mov ax, 3
+	mov [ptn], ax				;PUNTAJE A 3
  %endmacro
  
  %macro load_Juego 0
@@ -47,8 +48,9 @@
 		cmp al, 1bh	;ESC
 		je %%Pausa
 		
+		
 	%%Mov1:
-		cmp al,'d'
+		cmp al, 'd'
 		jne %%Mov2
 		
 		; si llega aqui es la tecla d
@@ -61,7 +63,7 @@
 		jmp %%mainLoop
 		
 	%%Mov2:
-		cmp al,'a'
+		cmp al, 'a'
 		jne %%mainLoop
 		mov ax,[CoordX_car]
 		cmp ax, 15
