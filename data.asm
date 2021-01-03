@@ -56,9 +56,11 @@ section .data
 	
 	;usuario n 0000 tmps
 	;1234567 8 9012 3456
-	ar_desor db 160 dup('$'), '$'
-	ar_orden db 160 dup('$'), '$'
-	ar_aux db 16 dup('$'), '$'
+	ar_desor db 120 dup('$'), '$'
+	ar_orden db 120 dup('$'), '$'
+	ar_linea db 12 dup('$'), '$'
+	ar_auxil db 4 dup('$'), '$'
+	;0123 -- NUMEROS
 	
 ;---------------------------------------------------------------
 ;-----------------------------USERS-----------------------------

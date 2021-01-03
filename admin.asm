@@ -41,39 +41,116 @@
 	
 	
 	mov si, 0
-	mov di, 0
 	mov ax, 0
+	mov cx, 0
 	%%cicloLectura:
 		mov dl, texto[si]
 		cmp dl, '$'
 		je %%fin_lectura
-			mov cx, 0
+			mov di, 0
 		%%lectura_user:		;LEER USUARIO 7 ESPACIOS
 			mov dl, texto[si]
-			mov ar_desor[di], dl
+			mov ar_linea[di], dl
 			inc di
 			inc si
-			inc cx
-			cmp cx, 7
+			cmp di, 7
 			jb %%lectura_user
 		%%lectura_nivel:	;LEER NIVEL 1 ESPACIO
 			inc si
 			mov dl, texto[si]
-			mov ar_desor[di], dl
-			inc di
+			mov ar_linea[di], dl
+			inc di	;sale con 8
 			add si, 2
-			mov cx, 0
 		%%lectura_puntaje:	;LEER PUNTAJE 4 ESPACIOS
 			mov dl, texto[si]	
-			mov ar_desor[di], dl
+			mov ar_linea[di], dl
 			inc di
 			inc si
-			inc cx
-			cmp cx, 4
+			cmp di, 12
 			jb %%lectura_puntaje
 		%%nuevaLinea:
 			add si, 7
 		inc ax
+		cmp ax, 11
+		jb %%ingresarNuevaLinea
+		%%ingresarEnLinea:
+			push si
+			mov si, 8
+			mov di, 0
+			jmp %%llenar_Auxil
+			%%recorrer_Matriz:
+				mov dl, ar_desor[si]
+				mov dh, ar_auxil[di]
+				cmp dl, dh
+				jb %%llenar_Auxil
+				cmp dl, dh
+				ja %%continuar_Matriz
+				inc si
+				inc di
+				cmp di, 4
+				jb %%recorrer_Matriz
+			%%continuar_Matriz:
+				sub si, 8
+				sub si, di
+				mov di, 0
+				add si, 12
+				cmp si, 120
+				jb %%recorrer_Matriz
+			jmp %%reemplazo_Fila
+			
+			%%llenar_Auxil:
+				sub si, di
+				mov bx, si
+				sub bx, 8
+				mov di, 0
+				%%llenar_ciclo:
+					mov dl, ar_desor[si]
+					mov ar_auxil[di], dl
+					inc si
+					inc di
+					cmp di, 4
+					jb %%llenar_ciclo
+			jmp %%continuar_Matriz
+			
+			%%reemplazo_Fila:
+				mov si, 8
+				mov di, 0
+				%%reemplazo_Verificar:
+					mov dh, ar_auxil[di]
+					mov dl, ar_linea[si]
+					cmp dh, dl
+					jb %%reemplazar
+					inc si
+					inc di
+					cmp si, 12
+					jb %%reemplazo_Verificar
+				jmp %%reemplazo_Fin
+					
+				%%reemplazar:
+					mov di, bx
+					mov si, 0
+					mov ax, 10
+					jmp %%ciclo_NuevaLinea
+			
+			%%reemplazo_Fin:
+				pop si
+				mov ax, 10
+				jmp %%cicloLectura
+				
+				
+		%%ingresarNuevaLinea:
+			mov di, cx
+			add cx, 12
+			push si
+			mov si, 0
+			%%ciclo_NuevaLinea:
+				mov dl, ar_linea[si]
+				mov ar_desor[di], dl
+				inc si
+				inc di
+				cmp si, 12
+				jb %%ciclo_NuevaLinea
+			pop si
 		jmp %%cicloLectura
 		
 	%%fin_lectura:
