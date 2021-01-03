@@ -210,6 +210,17 @@
 		%%llenado_enter:
 			mov bl, 10
 			mov texto[si], bl
+			inc si
+			mov di, 0
+		%%escritura_user:
+			mov dl, usr[di]
+			mov texto[si], dl
+			inc si
+			inc di
+			cmp di, 7
+			jb %%escritura_user
+			mov dl, ','
+			mov texto[si], dl
 		%%escritura_nivel:
 			inc si
 			mov dl, [nv0]
@@ -256,7 +267,7 @@
  %macro escritura_num1 1
 	mov bx, [%1]
 	cmp bx, 100
-	jb %%dosDigitos
+	jb %%dosCeros
 		mov ax, bx
 		mov bx, 100
 		mov dx, 0
@@ -266,6 +277,13 @@
 		escritura_num2 %1
 		pop dx
 		mov [%1], dx
+		inc si
+		jmp %%dosDigitos
+	%%dosCeros:
+		mov al, '0'
+		mov texto[si], al
+		inc si
+		mov texto[si], al
 		inc si
 	%%dosDigitos:
 		escritura_num2 %1

@@ -121,36 +121,3 @@
 		call %%ciclo
 	%%fin_ciclo:
 %endmacro
-
-%macro setDatoPts1 0
-	mov ah, 'p'
-	mov f_pts[0], ah
-	mov ah, 't'
-	mov f_pts[1], ah
-	mov ah, 's'
-	mov f_pts[2], ah
-	mov ah, '/'
-	mov f_pts[3], ah
-	mov ah, '.'
-	mov f_pts[11], ah
-	mov ah, 'p'
-	mov f_pts[12], ah
-	mov ah, 't'
-	mov f_pts[13], ah
-	mov ah, 's'
-	mov f_pts[14], ah
-%endmacro
-%macro setDatoPts 0
-	mov si, 4
-	mov di, 0
-	mov ah, '.'
-	%%ciclo:
-		cmp f_pts[si], ah
-			je %%fin_ciclo
-		mov al, usr[di]
-		mov f_pts[si], al
-		inc si
-		inc di
-		call %%ciclo
-	%%fin_ciclo:
-%endmacro

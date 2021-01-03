@@ -9,3 +9,9 @@
 	mov dx, er_Jue
 	int 21h
 %endmacro
+
+%macro errorAdmin 0
+	mov ah, 09h
+	mov dx, er_Adm
+	int 21h
+%endmacro

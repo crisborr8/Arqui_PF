@@ -60,8 +60,6 @@
 		mov ax, 0
 		mov [nvM], ax				;NIVEL MAXIMO A 0
 		resetPth
-		;setDatoPts1
-		setDatoPts					;AÑADE RUTA PARA GUARDAR PUNTAJES
 		user_Main
 		jmp %%fin
 	%%psw_inc:
@@ -274,30 +272,7 @@
 		mov bx,[filehndl]  ; the file handle
 		int 021h    
 	
-		crearPuntaje
-	
 		mov ah, 09h
 		mov dx, l_5
 		int 21h
-%endmacro
-
-%macro crearPuntaje 0
-	setDatoPts
-	
-	mov  ah, 3ch
-	mov  cx, 0
-	mov  dx,  f_pts
-	int  21h  
-	  
-	mov [filehndl],ax
-	
-	mov  ah, 40h
-	mov  bx, [filehndl]
-	mov  cx, si  ;STRING LENGTH.
-	mov  dx, '$'
-	int  21h
-	
-	mov ah,03Eh        ; the close-the-file function
-	mov bx,[filehndl]  ; the file handle
-	int 021h           ; call on Good Old Dos
 %endmacro
