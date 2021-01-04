@@ -5,9 +5,9 @@
 	imprimir t_orB, 04H	
 	ordenamientoEspacio	
 		
-	ordenar_Pintar
+	ordenar_PintarBubble
 	mov cl, [as_des]
-	cmp cl, 2
+	cmp cl, 1
 	je %%siguiente
 	ordenarBubble_Des
 	jmp %%finProg
@@ -93,7 +93,7 @@
 					clearBarras
 					sonidoAsignar
 					sonidoIniciar
-					ordenar_Pintar
+					ordenar_PintarBubble
 					sonidoTerminar
 					
 				%%finComparar:
@@ -182,7 +182,7 @@
 					clearBarras
 					sonidoAsignar
 					sonidoIniciar
-					ordenar_Pintar
+					ordenar_PintarBubble
 					sonidoTerminar
 					
 				%%finComparar:
@@ -196,7 +196,7 @@
 		jmp %%For_I
 	%%fin:
  %endmacro
- %macro ordenar_Pintar 0
+ %macro ordenar_PintarBubble 0
 	%%ciclo:
 		mov al, [segs]
 		mov ah, [segMax]
@@ -215,31 +215,398 @@
 	setDataSort
 	inic_Graph
 	
-	imprimir t_orQ, 04H	;Nivel
-	ordenamientoEspacio
+	imprimir t_orQ, 04H	
+	ordenamientoEspacio	
+		
+	ordenar_PintarQuick
 	
-	%%mainLoop:
-		imprimir t_orQ, 04H	;Nivel
-		setHeaderSort
-		setAncho
-		setMargen
-		dibujarBarras
-		;===================delay==========================
-		
-		Delay	
-
-		;============leer el buffer de mi teclado =========
-		HasKey 		; hay tecla?
-		jz %%mainLoop
-		
-		GetCh			; si hay una tecla presiona, cual tecla es la que se presiono
-		
-		cmp al,20h			; es espacio ? ,si sí,  se sale
-		jne %%mainLoop			;sino comprobar movimientos
-		
+	mov si, 0			;INDEX MENOR
+	mov	di, [tcant]
+	dec di
+	
+	call %%inicio
+	jmp %%finProg
+	
+	%%inicio:
+		cmp si, di
+		jnb %%fin
+			%%codigo:
+			push di
+			push si
+			
+			mov cl, [as_des]
+			cmp cl, 2
+			je %%quickAsc
+				ordenarQuick_Des	;PIVOTE EN AX
+			jmp %%siguiente
+			%%quickAsc:
+				ordenarQuick_Asc	;PIVOTE EN AX
+			
+			%%siguiente:
+				pop si
+				push ax
+				mov di, ax		;MAYOR
+				dec di
+				call %%inicio
+				pop ax
+				pop di
+				mov si, ax		;MENOR
+				inc si
+				call %%inicio
+	%%fin:
+	ret
+	
 	%%finProg:
+	imprimir t_orQ, 04H	
+	ordenamientoEspacio	
 	mov ax,3h		; funcion para el modo texto	
 	int 10h
+ %endmacro
+ %macro ordenarQuick_Des 0
+	push di
+	push si
+	
+	xor ax, ax
+	mov al, 12
+	mul di
+	mov di, ax
+	mov si, 0
+	%%llenarLinea:			;PIVOTE
+		mov dl, ar_desor[di]
+		mov ar_linea[si], dl
+		inc si
+		inc di
+		cmp si, 12
+		jb %%llenarLinea
+		
+	pop si
+	pop di
+	mov cx, si
+	dec cx					;I = MENOR - 1
+							;J = MENOR
+	%%For_J:
+		cmp si, di
+		jnb %%finFor_J
+		push di				;HIGH
+		push si				;HIGH - J
+		
+		xor ax, ax
+		mov al, 12
+		mul si
+		mov di, ax
+		
+		add di, 8
+		mov si, 8
+		%%comparar:
+			mov dl, ar_desor[di]
+			mov dh, ar_linea[si]
+			cmp dl, dh
+			ja %%finComparar
+			cmp dl, dh
+			jb %%cambio
+			inc di
+			inc si
+			cmp si, 12
+			jb %%comparar
+			jmp %%finComparar
+			
+		%%cambio:
+			inc cx
+			
+			xor ax, ax 
+			mov al, 12
+			mul cx
+			mov di, ax
+			
+			mov si, 0
+			%%llenarAux:
+				mov dl, ar_desor[di]
+				mov ar_liaux[si], dl
+				inc si
+				inc di
+				cmp si, 12
+				jb %%llenarAux
+				
+			sub di, 12 			;I
+			
+			pop ax				;->(J)
+			push ax	
+			mov si, 12
+			mul si
+			mov si, ax
+			
+			mov bx, 0
+			%%llenarOrig:
+				mov dl, ar_desor[si]
+				mov ar_desor[di], dl
+				inc si
+				inc di
+				inc bx
+				cmp bx, 12
+				jb %%llenarOrig
+			
+			
+			mov di, si
+			sub di, 12
+			mov si, 0
+			%%llenarAnt:
+				mov dl, ar_liaux[si]
+				mov ar_desor[di], dl
+				inc si
+				inc di
+				cmp si, 12
+				jb %%llenarAnt
+			
+			push cx
+			clearBarras
+			sonidoAsignar
+			sonidoIniciar
+			ordenar_PintarQuick
+			sonidoTerminar
+			pop cx 
+			
+		%%finComparar:
+			pop si
+			pop di
+			inc si
+			jmp %%For_J
+	%%finFor_J:
+	
+		push di
+		
+		xor ax, ax
+		mov al, 12
+		inc cx
+		mul cx
+		dec cx
+		
+		mov di, ax
+		mov si, 0
+		%%llenarTemp:			;TEMPORAL
+			mov dl, ar_desor[di]
+			mov ar_liaux[si], dl
+			inc si
+			inc di
+			cmp si, 12
+			jb %%llenarTemp
+			
+		sub di, 12
+		pop ax
+		mov si, 12
+		mul si
+		mov si, ax
+		mov bx, 0
+		%%llenarArr:
+			mov dl, ar_desor[si]
+			mov ar_desor[di], dl
+			inc si
+			inc di
+			inc bx
+			cmp bx, 12
+			jb %%llenarArr
+		
+		
+		mov di, si
+		sub di, 12
+		mov si, 0
+		%%llenarFar:
+			mov dl, ar_liaux[si]
+			mov ar_desor[di], dl
+			inc si
+			inc di
+			cmp si, 12
+			jb %%llenarFar
+		
+		push cx
+		clearBarras
+		sonidoAsignar
+		sonidoIniciar
+		ordenar_PintarQuick
+		sonidoTerminar
+		pop cx 
+
+		mov ax, cx
+		inc ax
+ %endmacro
+ %macro ordenarQuick_Asc 0
+	push di
+	push si
+	
+	xor ax, ax
+	mov al, 12
+	mul di
+	mov di, ax
+	mov si, 0
+	%%llenarLinea:			;PIVOTE
+		mov dl, ar_desor[di]
+		mov ar_linea[si], dl
+		inc si
+		inc di
+		cmp si, 12
+		jb %%llenarLinea
+		
+	pop si
+	pop di
+	mov cx, si
+	dec cx					;I = MENOR - 1
+							;J = MENOR
+	%%For_J:
+		cmp si, di
+		jnb %%finFor_J
+		push di				;HIGH
+		push si				;HIGH - J
+		
+		xor ax, ax
+		mov al, 12
+		mul si
+		mov di, ax
+		
+		add di, 8
+		mov si, 8
+		%%comparar:
+			mov dl, ar_desor[di]
+			mov dh, ar_linea[si]
+			cmp dl, dh
+			ja %%finComparar
+			cmp dl, dh
+			jb %%cambio
+			inc di
+			inc si
+			cmp si, 12
+			jb %%comparar
+			jmp %%finComparar
+			
+		%%cambio:
+			inc cx
+			
+			xor ax, ax 
+			mov al, 12
+			mul cx
+			mov di, ax
+			
+			mov si, 0
+			%%llenarAux:
+				mov dl, ar_desor[di]
+				mov ar_liaux[si], dl
+				inc si
+				inc di
+				cmp si, 12
+				jb %%llenarAux
+				
+			sub di, 12 			;I
+			
+			pop ax				;->(J)
+			push ax	
+			mov si, 12
+			mul si
+			mov si, ax
+			
+			mov bx, 0
+			%%llenarOrig:
+				mov dl, ar_desor[si]
+				mov ar_desor[di], dl
+				inc si
+				inc di
+				inc bx
+				cmp bx, 12
+				jb %%llenarOrig
+			
+			
+			mov di, si
+			sub di, 12
+			mov si, 0
+			%%llenarAnt:
+				mov dl, ar_liaux[si]
+				mov ar_desor[di], dl
+				inc si
+				inc di
+				cmp si, 12
+				jb %%llenarAnt
+			
+			push cx
+			clearBarras
+			sonidoAsignar
+			sonidoIniciar
+			ordenar_PintarQuick
+			sonidoTerminar
+			pop cx 
+			
+		%%finComparar:
+			pop si
+			pop di
+			inc si
+			jmp %%For_J
+	%%finFor_J:
+	
+		push di
+		
+		xor ax, ax
+		mov al, 12
+		inc cx
+		mul cx
+		dec cx
+		
+		mov di, ax
+		mov si, 0
+		%%llenarTemp:			;TEMPORAL
+			mov dl, ar_desor[di]
+			mov ar_liaux[si], dl
+			inc si
+			inc di
+			cmp si, 12
+			jb %%llenarTemp
+			
+		sub di, 12
+		pop ax
+		mov si, 12
+		mul si
+		mov si, ax
+		mov bx, 0
+		%%llenarArr:
+			mov dl, ar_desor[si]
+			mov ar_desor[di], dl
+			inc si
+			inc di
+			inc bx
+			cmp bx, 12
+			jb %%llenarArr
+		
+		
+		mov di, si
+		sub di, 12
+		mov si, 0
+		%%llenarFar:
+			mov dl, ar_liaux[si]
+			mov ar_desor[di], dl
+			inc si
+			inc di
+			cmp si, 12
+			jb %%llenarFar
+		
+		push cx
+		clearBarras
+		sonidoAsignar
+		sonidoIniciar
+		ordenar_PintarQuick
+		sonidoTerminar
+		pop cx 
+
+		mov ax, cx
+		inc ax
+ %endmacro
+ %macro ordenar_PintarQuick 0
+	%%ciclo:
+		mov al, [segs]
+		mov ah, [segMax]
+		cmp ah, al
+		jb %%fin
+		imprimir t_orQ, 04H
+		ordenamientoDibujo
+		Delay	
+		jmp %%ciclo
+	%%fin:
+		mov al, 0
+		mov [segs], al
  %endmacro
  ;*********************************************************
  %macro ordenamientoDibujo 0
