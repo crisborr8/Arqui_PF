@@ -224,36 +224,56 @@
 	mov	di, [tcant]
 	dec di
 	
-	call %%inicio
-	jmp %%finProg
+	mov cl, [as_des]
+	cmp cl, 2
+	je %%Ascendente
+		call %%inicioDes
+		jmp %%finProg
+	%%Ascendente:
+		call %%inicioAsc
+		jmp %%finProg
 	
-	%%inicio:
+	%%inicioDes:
 		cmp si, di
-		jnb %%fin
-			%%codigo:
+		jnb %%finDes
+			%%codigoDes:
 			push di
 			push si
 			
-			mov cl, [as_des]
-			cmp cl, 2
-			je %%quickAsc
-				ordenarQuick_Des	;PIVOTE EN AX
-			jmp %%siguiente
-			%%quickAsc:
-				ordenarQuick_Asc	;PIVOTE EN AX
+			ordenarQuick_Des	;PIVOTE EN AX
+				
+			pop si
+			push ax
+			mov di, ax		;MAYOR
+			call %%inicioDes
+			pop ax
+			pop di
+			mov si, ax		;MENOR
+			inc si
+			call %%inicioDes
+	%%finDes:
+	ret
+	
+	%%inicioAsc:
+		cmp si, di
+		jnb %%finAsc
+			%%codigoAsc:
+			push di
+			push si
 			
-			%%siguiente:
-				pop si
-				push ax
-				mov di, ax		;MAYOR
-				dec di
-				call %%inicio
-				pop ax
-				pop di
-				mov si, ax		;MENOR
-				inc si
-				call %%inicio
-	%%fin:
+			ordenarQuick_Asc	;PIVOTE EN AX
+			
+			pop si
+			push ax
+			mov di, ax		;MAYOR
+			dec di
+			call %%inicioAsc
+			pop ax
+			pop di
+			mov si, ax		;MENOR
+			inc si
+			call %%inicioAsc
+	%%finAsc:
 	ret
 	
 	%%finProg:
@@ -268,7 +288,7 @@
 	
 	xor ax, ax
 	mov al, 12
-	mul di
+	mul si
 	mov di, ax
 	mov si, 0
 	%%llenarLinea:			;PIVOTE
@@ -281,12 +301,13 @@
 		
 	pop si
 	pop di
-	mov cx, si
-	dec cx					;I = MENOR - 1
-							;J = MENOR
+	mov cx, si				;I = MENOR 
+	
+	push si						
+	inc si					;J = MENOR
 	%%For_J:
 		cmp si, di
-		jnb %%finFor_J
+		ja %%finFor_J
 		push di				;HIGH
 		push si				;HIGH - J
 		
@@ -301,9 +322,9 @@
 			mov dl, ar_desor[di]
 			mov dh, ar_linea[si]
 			cmp dl, dh
-			ja %%finComparar
+			jb %%finComparar
 			cmp dl, dh
-			jb %%cambio
+			ja %%cambio
 			inc di
 			inc si
 			cmp si, 12
@@ -372,13 +393,9 @@
 			jmp %%For_J
 	%%finFor_J:
 	
-		push di
-		
 		xor ax, ax
 		mov al, 12
-		inc cx
 		mul cx
-		dec cx
 		
 		mov di, ax
 		mov si, 0
@@ -391,7 +408,7 @@
 			jb %%llenarTemp
 			
 		sub di, 12
-		pop ax
+		pop ax					;MENOR
 		mov si, 12
 		mul si
 		mov si, ax
@@ -426,7 +443,6 @@
 		pop cx 
 
 		mov ax, cx
-		inc ax
  %endmacro
  %macro ordenarQuick_Asc 0
 	push di
