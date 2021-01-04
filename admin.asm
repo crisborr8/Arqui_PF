@@ -187,13 +187,13 @@
 		mov [tcant], ax
 		cmp ax, 0
 		je %%fin_error
-			guardarTop10Puntos
 			mostrarTop10Puntos
 			%%precionarBarra:
 				getChar
 				cmp al, ' '
 				jne %%precionarBarra
 			ordenamiento
+			guardarTop10Puntos
 		jmp %%fin
 	
 	%%fin_error:
