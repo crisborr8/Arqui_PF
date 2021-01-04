@@ -136,6 +136,8 @@
 	inc ax
 	mov [nv0], ax
 
+	mov ax, 20
+	mov [vel], ax				;VELOCIDAD
 	
 	setDatosNivel
  %endmacro
@@ -212,9 +214,12 @@
   
 %endmacro
 %macro setTiempo 0
+	mov ax, [segs]
+	inc ax
+	mov [segs], ax 
 	mov ax, [t_mi]
 	inc ax
-	mov [t_mi], ax
+	mov [t_mi], ax 
 	cmp ax, 100
 	jae %%mas_seg
 	jmp %%fin

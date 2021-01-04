@@ -121,3 +121,14 @@
 		call %%ciclo
 	%%fin_ciclo:
 %endmacro
+
+%macro resetAlt 0
+	xor si, si
+	mov al, '0'
+	%%ciclo:
+		mov alt_Aux[si], al
+		inc si
+		cmp si, 4
+		jb %%ciclo
+	%%fin_ciclo:
+%endmacro

@@ -45,19 +45,26 @@ section .data
 ;--------------------------DATA TOP 10--------------------------
 ;---------------------------------------------------------------
 	t_p   db '------------- TOP 10 PUNTOS -------------', 10, 13, '$'
+	t_p2  db 'TOP 10 POR PUNTUACION', 10, 13, '$'
 	t_t   db '------------- TOP 10 TIEMPO -------------', 10, 13, '$'
 	t_ep  db 'No.     USUARIO       NIVEL        PUNTOS', 10, 13, '$'
 	t_et  db 'No.     USUARIO       NIVEL        TIEMPO', 10, 13, '$'
+	t_or  db 'ORD:', 10, 13, '$'
+	t_orB db 'BUBBLESORT', 10, 13, '$'
+	t_orQ db 'QUICKSORT', 10, 13, '$'
+	t_tmp db 'TIEMPO:', 10, 13, '$'
+	t_vel db 'VEL:', 10, 13, '$'
+	
 	t_txt db 42 dup('$'), '$'
     ;t_txt db '1       1234567         0           0000 ', 10, 13, '$'
 	;          1234567890123456789012345678901234567890
 	;		   0        1         2         3		  4
-	tcant db 0, '$'
+	tcant dw 0, '$'
 	
 	;usuario n 0000 tmps
 	;1234567 8 9012 3456
 	ar_desor db 120 dup('$'), '$'
-	ar_orden db 120 dup('$'), '$'
+	ar_liaux db 12 dup('$'), '$'
 	ar_linea db 12 dup('$'), '$'
 	ar_auxil db 4 dup('$'), '$'
 	;0123 -- NUMEROS
@@ -85,6 +92,8 @@ section .data
 ;----------------------------Errores----------------------------
 ;---------------------------------------------------------------
 	er_Main db 'ERROR, seleccione un dato del 1 al 3', 10, 13, '$'
+	er_Ord db 'ERROR, seleccione una opcion del 1 al 2', 10, 13, '$'
+	er_Vel db 'ERROR, seleccione un valor del 1 al 9', 10, 13, '$'
 	er_Psw db 'ERROR, contrasenha solo debe de ser numerica', 10, 13, '$'
 	er_Usr db 'ERROR, usuario ya existe', 10, 13, '$'
 	er_IngU db 'ERROR, usuario incorrecto', 10, 13, '$'
@@ -114,6 +123,7 @@ section .data
 	t_s db 2 dup ('$'), '$'		;TIEMPO SEGUNDOS
 	t_m db 2 dup ('$'), '$'		;TIEMPO MINUTOS
 	
+	segs db 0, '$'		;TIEMPO SEGUNDOS ACTUALES
 	segAct db 0, '$'		;TIEMPO SEGUNDOS ACTUALES
 	segMax db 0, '$'		;TIEMPO SEGUNDOS MAXIMOS
 
@@ -121,7 +131,7 @@ section .data
 	dece 			db 0,"$"	;DECENA
 	dosP 			db 0,"$"	;DOS PUNTOS
 	
-	vel dw 20					;VELOCIDAD DE LAS ESTRELLAS
+	vel dw 20					;VELOCIDAD
 	perdido db 1				;VARIABLE QUE INDICA QUE NO HAS PERDIDO
 	
 ;---------------------------------------------------------------
@@ -197,10 +207,46 @@ section .data
 	stm_7  DB  27,27,02,27,27,27,02,27,27
 	stm_8  DB  27,02,27,27,46,27,27,02,27
 	stm_9  DB  47,27,27,27,45,27,27,27,47
-
+;---------------------------------------------------------------
+;----------------------------GRAFICA----------------------------
+;---------------------------------------------------------------
+	g_1 db 'SELECCIONE UN ORDENAMIENTO: ', 10, 13, '$'
+	g_2 db '1.- Ordenamiento BubbleSort', 10, 13, '$'
+	g_3 db '2.- Ordenamiento QuickSort', 10, 13, '$'
+	g_4 db 'SELECCIONE UNA FORMA: ', 10, 13, '$'
+	g_5 db '1.- DESCENDENTE', 10, 13, '$'
+	g_6 db '2.- ASCENDENTE', 10, 13, '$'
+	
+	v_1 db 'INGRESE UNA VELOCIDAD (0 - 9): ', 10, 13, '$'
+	
+	;usuario n 0000
+	;1234567 8 9012
+	;ar_desor db 120 dup('$'), '$'
+	as_des dw 0, '$'
+	color dw 0, '$'
+	alt_Aux db 4 dup('$'), '$'
+	alt_max dw 0, '$'				;ALTURA MAXIMA
+	altura dw 0, '$'					;ALTURA MAXIMA ES DE 140 EMPEZANDO EN 175 POR EL MARGEN DE 5 EN ALTURA
+								;PARA UNA PUNTACION A MAXIMA DE B LA ALTURA ES DE (140*C)/C_MAX
+								;Y INICIAL = (25+140)-ALTURA
+								
+	ancho dw 0, '$'					;ANCHO DE LAS BARRAS, EL ANCHO MAXIMO ES 280 CON 5 DE MARGEN A CADA LADO
+								;PARA X BARRAS EL ANCHO ES DE (290 - (X+1)*5)/X DONDE X ES LA CANTIDAD DE BARRAS
+								;X = 1  --->  ANCHO = 280
+								;X = 2  --->  ANCHO = 137
+								;X = 3  --->  ANCHO = 90
+								;X = 4  --->  ANCHO = 66
+								;X = 5  --->  ANCHO = 52
+								;X = 6  --->  ANCHO = 42
+								;X = 7  --->  ANCHO = 35
+								;X = 8  --->  ANCHO = 30
+								;X = 9  --->  ANCHO = 26
+								;X = 10 --->  ANCHO = 23
+								;X INICIAL = (25 + X*5 + (X-1)*ANCHO)
 ;---------------------------------------------------------------
 ;----------------------------ARCHIVO----------------------------
 ;---------------------------------------------------------------
 	f_user db 'files/users.usr', 0
 	f_pts db 'files/puntaje.pts', 0
+	f_rep db 'files/Puntos.rep', 0
 	texto times 255 dw '$'

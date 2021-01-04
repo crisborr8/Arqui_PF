@@ -5,6 +5,8 @@ org 100h
 %include "user.asm"
 %include "Juego.asm"
 %include "admin.asm"
+%include "grafica.asm"
+%include "ordenamiento.asm"
 %include "getData.asm"	
 %include "errors.asm"	
 %include "extra.asm"		

@@ -159,3 +159,18 @@
 		cmp si, 42
 		jb %%ciclo
 %endmacro
+
+%macro setAlturaNum 0	;alt_maxAux(char 4) a altura(int xx)
+	mov si, 0
+	mov al, 0		;ALTURA INT
+	mov cl, 10
+	%%ciclo:
+		mov dl, alt_Aux[si]
+		sub dl, 30h
+		mul cl
+		add al, dl
+		inc si
+		cmp si, 4
+		jb %%ciclo
+	mov [altura], al
+%endmacro
